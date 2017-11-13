@@ -1,0 +1,15 @@
+{
+  "name": "psx-download-helper-nodejs",
+  "version": "1.0.0",
+  "description": "Helps download app/games on pc and then transfer them to ps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["psx download helper"],
+  "author": "harryi3t <66hari@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "send": "^0.16.1"
+  }
+}
