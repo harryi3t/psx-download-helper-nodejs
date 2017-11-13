@@ -16,33 +16,40 @@ function onRequest(client_req, client_res) {
         filePath,
         readStream,
         stat;
-    console.log('\nserve: ' + client_req.url);
+    console.log('\npsxdh~serve: ' + client_req.url);
 
     // if it's a PS game URL then check our cached folder for the game file
     if (match = client_req.url.match(PS_REGEX)) {
-        console.log('Found a PS game URL. Checking the data folder for the file');
-        console.log('headers sent', client_req.headers)
+        console.log('psxdh: Found a PS game URL. Checking the data folder for the file');
+        console.log('psxdh: Range', client_req.headers.range)
 
         filePath = path.join(__dirname, 'data', match[FILE_INDEX]);
         fs.stat(filePath, function (err, stat) {
             if (err) {
-                console.log('Warning: file not found locally' +
+                console.log('psxdh~warning: file not found locally' +
                     '\nPlease put the downloaded game file in the data folder without renaming.');
                 return client_res.end();
             }
 
-            console.log('Found the game file locally. Sending it to the PS!')
+            console.log('psxdh: Found the game file locally. Sending it to the PS!')
 
-            send(client_req, filePath)
-                .on('error', (err) => {
-                    console.log('send~error', err);
-                    client_res.statusCode = err.status || 500;
-                    client_res.end(err.message);
-                })
-                .pipe(client_res);
+            try {
+                send(client_req, filePath)
+                    .on('error', (err) => {
+                        console.log('send~error', err);
+                        client_res.statusCode = err.status || 500;
+                        client_res.end(err.message);
+                    })
+                    .pipe(client_res);
+            } catch (err) {
+                console.error('psxdh~error', err);
+            }
         });
     }
-    else {
+    else { // this part does not work well. It works well for at-least the game description link (PS first makes a call
+        // get the game desc which is in json). Ideally user should be able to fully use PS network related tasks
+        // while in proxy mode like nagivating the store.
+
         proxy = http.request(client_req.url, function (res) {
             Object.keys(res.headers).forEach(function (key) {
                 client_res.setHeader(key, res.headers[key]);
@@ -59,6 +66,6 @@ function onRequest(client_req, client_res) {
 }
 
 console.log(`
-Proxy listening on http://localhost:${SERVER_PORT}
+psxdh: Proxy listening on http://localhost:${SERVER_PORT}
 `);
 
