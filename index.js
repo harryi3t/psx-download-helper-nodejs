@@ -24,6 +24,7 @@ function onRequest(client_req, client_res) {
         console.log('psxdh: Range', client_req.headers.range)
 
         filePath = path.join(__dirname, '../storage/shared/psx/', match[FILE_INDEX]);
+        console.log(filePath);
         fs.stat(filePath, function (err, stat) {
             if (err) {
                 console.log('psxdh~warning: file not found locally' +
@@ -50,18 +51,22 @@ function onRequest(client_req, client_res) {
         // get the game desc which is in json). Ideally user should be able to fully use PS network related tasks
         // while in proxy mode like nagivating the store.
 
-        proxy = http.request(client_req.url, function (res) {
-            Object.keys(res.headers).forEach(function (key) {
-                client_res.setHeader(key, res.headers[key]);
-            });
-            res.pipe(client_res, {
-                end: true
-            });
-        });
+        // proxy = http.request(client_req.url, function (res) {
+        //     Object.keys(res.headers).forEach(function (key) {
+        //         client_res.setHeader(key, res.headers[key]);
+        //     });
+        //     res.pipe(client_res, {
+        //         end: true
+        //     });
+        // });
+        //
+        // client_req.pipe(proxy, {
+        //     end: true
+        // });
 
-        client_req.pipe(proxy, {
-            end: true
-        });
+        console.log("Not a game url");
+        console.log(client_req.url);
+        return client_res.end();
     }
 }
 
