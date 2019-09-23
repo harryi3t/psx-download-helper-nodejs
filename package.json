@@ -6,10 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["psx download helper"],
+  "keywords": [
+    "psx download helper"
+  ],
   "author": "harryi3t <66hari@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "minimist": "^1.2.0",
     "send": "^0.16.1"
   }
 }
