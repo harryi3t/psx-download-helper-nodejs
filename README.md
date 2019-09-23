@@ -26,3 +26,12 @@ Download links for a few free games to try out this script
 6. Resume the download. It will fail, check the console and grab the link.
 7. Download the file using your favourite download manager and put it in the data folder
 8. Resume download again. This time the download bar should increase. Repeat step 6-8 until all the parts are downloaded. You can save time by downloading all the parts before hand.
+
+### CLI Options
+1. "--dataDir"  
+    Provide custom directory path where game files are downloaded.
+    
+    eg:- `debug=send node index.js --dataDir=/home/sachdevnitin/Downloads/`
+    
+    default:- "data" 
+     
