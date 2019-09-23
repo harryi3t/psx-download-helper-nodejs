@@ -1,53 +1,37 @@
-const send = require('send'),
+var send = require('send'),
     http = require('http'),
     fs = require('fs'),
     path = require('path');
 
-const SERVER_PORT = 8081,
+SERVER_PORT = 8081,
     // e.g. http://gs2.ww.prod.dl.playstation.net/gs2/ppkgo/prod/CUSA05528_00/23/f_947a347c1221b18179a82a9a95d360695eba4a14e837af8949574ac1949174e8/f/EP1965-CUSA05528_00-2016NEVERWINTER1-A0420-V0100_0.pkg?downloadId=00000040&du=000000000000004000e21d2a2866c395&country=in&downloadType=ob&q=a8318f20bb9240e28bc92c6539296c53e7b1ba45be89a14559d619693330d2b3&threadId=1&serverIpAddr=192.168.1.3&r=00000004
     PS_REGEX = /^http:\/\/gs2\.ww\.prod\.dl\.playstation\.net.*\/([^\?]+)\?downloadId.*/,
     FILE_INDEX = 1; // index of the file name in the regex-match array
 
-
-let dataDir = path.join(__dirname, "data"),
-    cliArgs = process.argv.slice(2),
-    dataDirOptionIndex = cliArgs.indexOf("--dataDir");
-
-if (dataDirOptionIndex !== -1 && cliArgs[dataDirOptionIndex + 1]) {
-    if (fs.existsSync(cliArgs[dataDirOptionIndex + 1])) {
-        dataDir = path.join(__dirname, cliArgs[dataDirOptionIndex + 1]);
-    } else {
-        console.log(`Invalid "dataDir":- ${cliArgs[dataDirOptionIndex + 1]}`);
-        console.log("Using default value");
-    }
-}
-
-console.log(`Data Directory:- "${dataDir}"`);
 http.createServer(onRequest).listen(SERVER_PORT);
 
 function onRequest(client_req, client_res) {
-    let proxy,
+    var proxy,
         match,
         filePath,
+        readStream,
         stat;
     console.log('\npsxdh~serve: ' + client_req.url);
-    console.log(dataDir);
+
     // if it's a PS game URL then check our cached folder for the game file
     if (match = client_req.url.match(PS_REGEX)) {
         console.log('psxdh: Found a PS game URL. Checking the data folder for the file');
-        console.log('psxdh: Range', client_req.headers.range);
+        console.log('psxdh: Range', client_req.headers.range)
 
-        filePath = path.join(dataDir, match[FILE_INDEX]);
+        filePath = path.join(__dirname, '../storage/shared/psx/', match[FILE_INDEX]);
         fs.stat(filePath, function (err, stat) {
             if (err) {
-                console.log(`
-                    psxdh~warning: file not found locally
-                    \nPlease put the downloaded game file in the "${dataDir}" folder without renaming.
-                    `);
+                console.log('psxdh~warning: file not found locally' +
+                    '\nPlease put the downloaded game file in the data folder without renaming.');
                 return client_res.end();
             }
 
-            console.log('psxdh: Found the game file locally. Sending it to the PS!');
+            console.log('psxdh: Found the game file locally. Sending it to the PS!')
 
             try {
                 send(client_req, filePath)
@@ -61,9 +45,10 @@ function onRequest(client_req, client_res) {
                 console.error('psxdh~error', err);
             }
         });
-    } else { // this part does not work well. It works well for at-least the game description link (PS first makes a call
+    }
+    else { // this part does not work well. It works well for at-least the game description link (PS first makes a call
         // get the game desc which is in json). Ideally user should be able to fully use PS network related tasks
-        // while in proxy mode like navigating the store.
+        // while in proxy mode like nagivating the store.
 
         proxy = http.request(client_req.url, function (res) {
             Object.keys(res.headers).forEach(function (key) {
@@ -83,4 +68,3 @@ function onRequest(client_req, client_res) {
 console.log(`
 psxdh: Proxy listening on http://localhost:${SERVER_PORT}
 `);
-
