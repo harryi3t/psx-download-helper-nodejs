@@ -12,7 +12,6 @@
   "author": "harryi3t <66hari@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "minimist": "^1.2.0",
     "send": "^0.16.1"
   }
 }
